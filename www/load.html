@@ -1,0 +1,99 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+    <link rel="stylesheet" href="components/loader.css">
+    <script src="components/loader.js"></script>
+    <link rel="stylesheet" href="components/loader.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <script>
+        //ローカルストレージの設定
+        var storage = localStorage;
+        //locationStorageのキー(今回はword001)
+        var keyword = "word001";
+
+        //単語リスト(仮データ)
+        var kariData = [
+            { japanese: "電話", english: "Phone" },
+            { japanese: "歴史", english: "History" },
+            { japanese: "社会", english: "Society" },
+            { japanese: "世代", english: "Generation" },
+            { japanese: "知識", english: "Knowledge" }
+        ];
+
+        //単語リスト
+        var wordList = [];
+
+        //データ読込
+        function loadData() {
+            alert("データを読み込みます");
+            //ローカルストレージからデータを取り出す
+            var strData = storage.getItem(keyword);
+
+            if (strData === null) {
+                alert("データがありません。初期データをロードします");
+                wordList = kariData;
+                //ローカルストレージに保存(初期データ)
+                strData = JSON.stringify(wordList);
+                storage.setItem(keyword, strData);
+                kekka();
+            } else {
+                alert("データを読み込みます")
+                strData = storage.getItem(keyword);
+                wordList = JSON.parse(strData);
+            }
+
+            //結果表示
+            document.getElementById("resultMessage1").innerHTML = "問題読込完了";
+            document.getElementById("resultMessage2").innerHTML = "問題数は" + wordList.length + "件です";
+        }
+
+        //問題初期化処理
+        function resetData() {
+            storage.removeItem(keyword);
+            alert("ローカルストレージの内容を削除しました");
+            document.getElementById("resultMessage1").innerHTML = "";
+            document.getElementById("resultMessage2").innerHTML = "";
+            var keyword2 = "result001";
+            storage.removeItem(keyword2);
+        }
+
+        //結果格納用連想配列をローカルストレージに設定
+        function kekka() {
+            var keyword2 = "result001";
+            var kekkaList = [{ date: "日付", result: "結果(正答率)" }];
+            //ローカルストレージに保存(初期データ)
+            var strData2 = JSON.stringify(kekkaList);
+            storage.setItem(keyword2, strData2);
+
+        }
+    </script>
+</head>
+
+<body>
+    <h1>問題読込</h1>
+    <div id="roadForm">
+        <p>
+            <button class="butt" onclick="loadData()">問題読込</button>
+        </p>
+        <p>
+            <button class="butt" onclick="resetData()">問題初期化</button>
+        </p>
+
+    </div>
+
+    <p id="resultMessage1"></p>
+    <p id="resultMessage2"></p>
+
+    <div>
+        <p>
+            <a href="index.html" class="top">トップメニューへ</a>
+        </p>
+    </div>
+</body>
+
+</html>

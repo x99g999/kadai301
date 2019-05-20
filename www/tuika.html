@@ -1,0 +1,77 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: content: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+    <script src="components/loader.js"></script>
+    <link rel="stylesheet" href="components/loader.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script>
+    </script>
+</head>
+
+<body onload="initData()">
+    <h1 id="title">問題追加</h1>
+    <div id="  yomikomiForm">
+        <input type="text" value="" id="japanese" placeholder="追加する日本語を入力してください">
+        <input type="text" value="" id="english" placeholder="追加する英語を入力してください">
+        <button class="button" onclick="addData()">問題追加</button>
+        <button class="button" onclick="clearButton()">クリア</button>
+        <br>
+        <a href="index.html" class="backMain">メニュー画面に戻る</a>
+    </div>
+    <p id="resultMessage1"></p>
+    <p id="resultMessage2"></p>
+
+    <script>
+        var wordList = [];
+        var storage = localStorage;
+        var keyword = "word01";
+
+
+        //問題を取得する
+        function initData() {
+            //データの読み込み処理
+            var strData = storage.getItem(keyword);
+
+            //データが存在しない場合はエラー
+            if (strData === null) {
+                alert("問題読込をしてから再実行してください");
+                //メインメニューに差し戻す
+                location.href = "index.html";
+            } else {
+                wordList = JSON.parse(strData);
+            }
+        }
+
+        function addData() {
+            var jap = document.getElementById("japanese").value;
+            var eng = document.getElementById("english").value;
+            //空白判定処理
+            if (jap === "" || eng === "") {
+                alert("空白を入力しないでください。");
+                return;
+            }
+            var hash1 = {};         //空の連想配列を宣言
+            hash1.japanese = jap    //日本語をセット
+            hash1.english = eng     //英語をセット
+            wordList.push(hash1);   //配列の最後尾に追加
+
+            //ローカルストレージに保存する（初期データ）
+            strData = JSON.stringify(wordList);
+            strData = storage.setItem(keyword, strData);
+            alert("日本語：" + wordList[wordList.length - 1].japanese + "\n" + "英語：" + wordList[wordList.length - 1].english + "を追加しました。");
+        }
+        //クリア処理
+        function clearButton() {
+            document.getElementById("japanese").value = "";
+            document.getElementById("english").value = "";
+            alert("クリア");
+        }
+
+    </script>
+</body>
+
+</html>

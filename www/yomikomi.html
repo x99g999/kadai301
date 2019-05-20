@@ -1,0 +1,118 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: content: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+    <script src="components/loader.js"></script>
+    <link rel="stylesheet" href="components/loader.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script>
+
+    </script>
+</head>
+
+<body>
+    <h1 id="title">問題読込</h1>
+    <div id="  yomikomiForm">
+        <button class="button" onclick="loadData()">問題読込</button>
+        <button class="button" onclick="resetData()">問題初期化</button>
+        <br>
+        <a href="index.html" class="backMain">メニュー画面に戻る</a>
+    </div>
+    <p id="resultMessage1"></p>
+    <p id="resultMessage2"></p>
+    <script>
+        var storage = localStorage;
+        var keyword = "word01";
+
+        //単語リスト（仮データ）
+        var kariData = [
+            {
+                japanese: "電話",
+                english: "Phone"
+            },
+            {
+                japanese: "歴史",
+                english: "History"
+            },
+            {
+                japanese: "社会",
+                english: "Society"
+            },
+            {
+                japanese: "世代",
+                english: "Generation"
+            },
+            {
+                japanese: "知識",
+                english: "Knowledge"
+            }
+        ];
+
+        //単語リスト
+        var wordList = [];
+
+        //データ読込
+        function loadData() {
+            //ローカルストレージからデータを取り出す
+            var strData = storage.getItem(keyword);
+
+            if (strData === null) {
+                alert("データがありません。初期データをロードします");
+                wordList = kariData;
+                //ローカルストレージに保存する（初期データ）
+                strData = JSON.stringify(wordList);
+                strData = storage.setItem(keyword, strData);
+            } else {
+                alert("データを読み込みます");
+                //ローカルストレージからデータを取得する
+                strData = storage.getItem(keyword);
+                wordList = JSON.parse(strData);
+
+                //問題数が0問の場合
+                if (wordList.length <= 0) {
+                    alert("問題がありません。初期データをロードします");
+                    wordList = kariData;
+                    //ローカルストレージに保存する（初期データ）
+                    strData = JSON.stringify(wordList);
+                    strData = storage.setItem(keyword, strData);
+                }
+
+            }
+
+            //デバッグ用の一覧表示
+            alert("データの件数は" + wordList.length + "件です");
+
+
+            //結果表示
+            document.getElementById("resultMessage1").innerHTML = "問題読込完了";
+            document.getElementById("resultMessage2").innerHTML = "問題数は" + wordList.length + "件です";
+            listData();//リスト表示
+        }
+
+        //問題の初期化
+        function resetData() {
+            storage.removeItem(keyword);
+            alert("ローカルストレージの内容を削除しました");
+            document.getElementById("resultMessage1").innerHTML = "";
+            document.getElementById("resultMessage2").innerHTML = "";
+        }
+
+        //リスト表示処理
+        function listData() {
+            //画面表示処理
+            for (var i = 0; i < wordList.length; i++) {
+                var li = document.createElement("h2");
+                //箇条書きの中身
+                li.className = "list";
+                li.innerHTML = "日本語：" + wordList[i].japanese + "<br>"
+                    + "英語：" + wordList[i].english;
+                document.getElementById("resultMessage2").appendChild(li);
+            }
+        }
+    </script>
+</body>
+
+</html>

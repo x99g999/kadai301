@@ -1,0 +1,82 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: content: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+    <script src="components/loader.js"></script>
+    <link rel="stylesheet" href="components/loader.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script>
+
+    </script>
+</head>
+
+<body onload="listData()">
+    <h1 id="title">問題削除</h1>
+    <button class="button" onclick="delData()">問題削除</button>
+    <br>
+    <a href="index.html" class="backMain">メニュー画面に戻る</a>
+    <div id="listForm">
+    </div>
+    <!--何かメッセージを表示する場合  -->
+    <div id="message"></div>
+    <script>
+        var wordList = [];
+        var storage = localStorage;
+        var keyword = "word01";
+
+        //データの読み込み処理
+        var strData = storage.getItem(keyword);
+        wordList = JSON.parse(strData);
+
+        //リスト表示
+        function listData() {
+            //画面表示処理
+            for (var i = 0; i < wordList.length; i++) {
+                var li = document.createElement("div");
+                //箇条書きの中身
+                li.className = "list";
+                li.innerHTML = '<input type="checkbox" name="delCheck" onclick="checkList()">' + '<h2 class= "editList">' + "日本語：" + wordList[i].japanese + "<br>"
+                    + "英語：" + wordList[i].english + "</h2>";
+                document.getElementById("listForm").appendChild(li);
+            }
+        }
+
+        //色付与処理
+        function checkList() {
+            var elements = document.getElementsByName("delCheck");
+            var listClass = document.getElementsByClassName('list');
+            for (var i = elements.length - 1; i >= 0; i--) {
+                if (elements[i].checked == true) {
+                    listClass[i].style.backgroundColor = "#FF99CC";
+                    listClass[i].style.webkitBoxShadow = "0px 0px 0px 10px #FF99CC";
+                    listClass[i].style.borderColor = "#ffd6ea";
+                } else {
+                    listClass[i].style.backgroundColor = "#fff2e5";
+                    listClass[i].style.webkitBoxShadow = "0px 0px 0px 10px #fff2e5";
+                    listClass[i].style.borderColor = "#ffc3c3";
+                }
+            }
+        }
+
+        //削除処理
+        function delData() {
+            var elements = document.getElementsByName("delCheck");
+            for (var i = elements.length - 1; i >= 0; i--) {
+                if (elements[i].checked == true) {
+                    alert("日本語：" + wordList[i].japanese + "\n" + "英語：" + wordList[i].english + "を削除しました");
+                    wordList.splice(i, 1);//削除
+                }
+            }
+            //ローカルストレージに保存する（初期データ）
+            strData = JSON.stringify(wordList);
+            strData = storage.setItem(keyword, strData);
+            document.getElementById("listForm").innerHTML = ""; //追加した要素を削除させる
+            listData();
+        }
+    </script>
+</body>
+
+</html>

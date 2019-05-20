@@ -1,0 +1,198 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: content: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+    <script src="components/loader.js"></script>
+    <link rel="stylesheet" href="components/loader.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script>
+        // 問題番号
+        var no = 0;
+        // 正解数
+        var score = 0;
+        // 単語リスト
+        var wordList = [];
+        //ストレージ関係
+        var storage = localStorage;
+        var keyword = "word001";
+
+        //wordListランダム参照配列
+        var ran = [];
+        //ゼロカウント
+        var zerocnt = 0;
+        //ランダム参照用
+        var no2 = 0;
+
+        //結果保存用連想配列
+        var kekkaList = {};//トータル結果格納
+        var konkaiList = {};//今回の追加データ格納
+        var keyword2 = "result001";
+        var strData2 = storage.getItem(keyword2);
+        kekkaList = JSON.parse(strData2);
+
+        //日付取得
+        var hiduke = new Date();
+        var year = hiduke.getFullYear();
+        var month = hiduke.getMonth();
+        var day = hiduke.getDate();
+        var hour = hiduke.getHours();
+        var minute = hiduke.getMinutes();
+
+
+
+        // 問題を表示する
+        function showQuestion() {
+            if (no < wordList.length) {
+                change();
+                //次の問題がある場合は、表示する
+                document.getElementById("question").innerHTML = wordList[no2].japanese;
+            } else {
+                //全問終了したら、成績を発表する
+                document.getElementById("question").innerHTML = score + "/" + wordList.length;
+                document.getElementById("answerForm").style.display = "none";
+                document.getElementById("resultForm").style.display = "block";
+                if (score === wordList.length) {
+                    //全問正解の場合
+                    document.getElementById("resultMessage").innerHTML = "全問正解！よくできました！";
+                    document.getElementById("resultImage").src = "gold.png";
+                } else if (score >= wordList.length * 0.6) {
+                    //6割以上正解の場合
+                    document.getElementById("resultMessage").innerHTML = "惜しい！あともう一歩でした！";
+                    document.getElementById("resultImage").src = "silver.png";
+                } else {
+                    //6割未満の場合
+                    document.getElementById("resultMessage").innerHTML = "もう少しがんばりましょう。";
+                    document.getElementById("resultImage").src = "bronze.png";
+                }
+                ke();
+
+            }
+        }
+
+        // 入力された回答の正誤判定を行う
+        function judge() {
+            var answer = document.getElementById("answer").value;
+            //入力された解答を全て小文字に変換
+            answer = answer.toLowerCase();
+
+            if (answer === wordList[no2].english.toLowerCase()) {
+                alert("正解です！");
+                score++;
+            } else {
+                alert("残念！不正解です。");
+            }
+
+            //次の問題を表示
+            no++;
+            showQuestion();
+            var answer = document.getElementById("answer").value = "";
+        }
+
+        //リスタート
+        function restart() {
+            no = 0;
+            score = 0;
+
+            document.getElementById("answerForm").style.display = "block";
+            document.getElementById("resultForm").style.display = "none";
+            location.reload();
+        }
+
+        //問題取得処理
+        function initData() {
+            //データ読込
+            var strData = storage.getItem(keyword);
+
+            //データが存在しない場合エラー
+            if (strData === null) {
+                alert("問題がありません。問題読込をしてから再実行してください");
+                //メインメニューへ戻る
+                location.href = "index.html";
+            } else {
+                wordList = JSON.parse(strData);
+                if (wordList.length === 0) {
+                    alert("問題がありません。問題読込をしてから再実行してください");
+                    //メインメニューへ戻る
+                    location.href = "index.html";
+                } else {
+                    rand();
+                    alert("問題は全部で" + wordList.length + "問です");
+                    //問題表示
+                    showQuestion();
+                }
+            }
+        }
+
+        //重複なしランダム処理
+        function rand() {
+            ran = new Array(wordList.length);
+
+            //作成した配列に0からwordList-1と同じ数まで格納
+            for (var i = 0; i <= wordList.length - 1; i++) {
+                ran[i] = i;
+            }
+
+            var soe = 0;//ran参照用ランダム添え字
+
+        }
+
+        //結果格納、取得、表示処理
+        function ke() {
+            //今回の結果&日時を連想配列に格納
+            konkaiList.date = year + "年" + month + "月" + day + "日" + hour + "時" + minute + "分";
+            konkaiList.result = (score / wordList.length * 100) + "%";
+            kekkaList.push(konkaiList);
+            strData2 = JSON.stringify(kekkaList);
+            storage.setItem(keyword2, strData2);
+        }
+
+        //重複なしランダム添え字生成処理
+        function change() {
+            soe = Math.floor(Math.random() * ran.length);
+
+            while (ran[soe] === 0) {
+                zerocnt++;
+                if (zerocnt === 1) {
+                    break;
+                }
+                soe = Math.floor(Math.random() * ran.length);
+            }
+            no2 = ran[soe];//no2にranから数字取り出し
+            ran[soe] = 0;//取り出した場所には0を格納
+        }
+    </script>
+</head>
+
+<body onload="initData()">
+    <h1 id="title">Question</h1>
+    <div id="question"></div>
+    <div id="answerForm">
+        <br />
+        <input type="text" id="answer" placeholder="英単語を入力">
+        <p>
+            <button onclick="judge()" id="ok" class="butt">OK</button>
+        </p>
+    </div>
+    <div id="resultForm" style="display:none">
+        <p id="resultMessage"></p>
+
+
+        <img id="resultImage" src="">
+
+
+    </div>
+    <p>
+        <button onclick="restart()" id="restart" class="top">リスタート</button>
+    </p>
+    <p>
+        <a href="result.html" class="top">今までの成績へ</a>
+    </p>
+    <p>
+        <a href="index.html" class="top">トップメニューへ</a>
+    </p>
+</body>
+
+</html>
